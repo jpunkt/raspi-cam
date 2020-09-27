@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+import os
 import signal
 from subprocess import Popen
 
@@ -5,7 +7,7 @@ from gpiozero import Button
 from picamera import PiCamera
 from datetime import datetime
 
-import os
+_must_stop = False
 
 
 def main():
@@ -22,14 +24,15 @@ def main():
         cam.capture('/home/pi/{0}.jpg'.format(today))
 
     def stop():
-        raise KeyboardInterrupt
+        global _must_stop
+        _must_stop = True
 
     btn1.when_pressed = cam.start_preview
     btn2.when_pressed = cam.stop_preview
     btn4.when_pressed = stop
     shutter.when_pressed = capture
     try:
-        while True:
+        while not _must_stop:
             pass
     except KeyboardInterrupt:
         pass
